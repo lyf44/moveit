@@ -39,6 +39,7 @@
 #include <moveit/planning_pipeline/planning_pipeline.h>
 #include <moveit/plan_execution/plan_execution.h>
 #include <moveit/plan_execution/plan_with_sensing.h>
+#include <moveit/plan_execution/plan_while_execution.h>
 
 move_group::MoveGroupContext::MoveGroupContext(
     const planning_scene_monitor::PlanningSceneMonitorPtr& planning_scene_monitor, bool allow_trajectory_execution,
@@ -55,6 +56,7 @@ move_group::MoveGroupContext::MoveGroupContext(
         planning_scene_monitor_->getRobotModel(), planning_scene_monitor_->getStateMonitor()));
     plan_execution_.reset(new plan_execution::PlanExecution(planning_scene_monitor_, trajectory_execution_manager_));
     plan_with_sensing_.reset(new plan_execution::PlanWithSensing(trajectory_execution_manager_));
+    plan_while_execution_.reset(new plan_execution::PlanWhileExecution(planning_scene_monitor_, trajectory_execution_manager_));
     if (debug)
       plan_with_sensing_->displayCostSources(true);
   }
@@ -74,6 +76,7 @@ move_group::MoveGroupContext::~MoveGroupContext()
   trajectory_execution_manager_.reset();
   planning_pipeline_.reset();
   planning_scene_monitor_.reset();
+  plan_while_execution_.reset();
 }
 
 bool move_group::MoveGroupContext::status() const

@@ -270,7 +270,7 @@ bool TrajectoryExecutionManager::push(const moveit_msgs::RobotTrajectory& trajec
   TrajectoryExecutionContext* context = new TrajectoryExecutionContext();
   if (configure(*context, trajectory, controllers))
   {
-    if (verbose_)
+    // if (verbose_)
     {
       std::stringstream ss;
       ss << "Pushed trajectory for execution using controllers [ ";
@@ -940,7 +940,7 @@ bool TrajectoryExecutionManager::validate(const TrajectoryExecutionContext& cont
   ROS_DEBUG_NAMED(name_, "Validating trajectory with allowed_start_tolerance %g", allowed_start_tolerance_);
 
   robot_state::RobotStatePtr current_state;
-  if (!csm_->waitForCurrentState(ros::Time::now()) || !(current_state = csm_->getCurrentState()))
+  if (!csm_->waitForCurrentState(ros::Time::now(), 2.0) || !(current_state = csm_->getCurrentState()))
   {
     ROS_WARN_NAMED(name_, "Failed to validate trajectory: couldn't receive full current joint state within 1s");
     return false;
@@ -1012,6 +1012,8 @@ bool TrajectoryExecutionManager::validate(const TrajectoryExecutionContext& cont
         jm->computeTransform(current_state->getJointPositions(jm), cur_transform);
         start_transform = tf2::transformToEigen(transforms[i]);
         Eigen::Vector3d offset = cur_transform.translation() - start_transform.translation();
+        // ROS_INFO_STREAM_NAMED(name_, "current: " << cur_transform.translation().transpose() 
+        //                               << " start: " << start_transform.translation().transpose());
         Eigen::AngleAxisd rotation;
         rotation.fromRotationMatrix(cur_transform.rotation().transpose() * start_transform.rotation());
         if ((offset.array() > allowed_start_tolerance_).any() || rotation.angle() > allowed_start_tolerance_)
@@ -1054,6 +1056,14 @@ bool TrajectoryExecutionManager::configure(TrajectoryExecutionContext& context,
   {
     ROS_WARN_NAMED(name_, "The trajectory to execute specifies no joints");
     return false;
+  } else {
+    for (auto name: actuated_joints) {
+      ROS_INFO_STREAM("TrajectoryExecutionManager/acutated_joints: " << name);
+    }
+  }
+
+  for (auto name: controllers) {
+    ROS_INFO_STREAM("TrajectoryExecutionManager/controllers: " << name);
   }
 
   if (controllers.empty())
@@ -1067,6 +1077,10 @@ bool TrajectoryExecutionManager::configure(TrajectoryExecutionContext& context,
       for (std::map<std::string, ControllerInformation>::const_iterator it = known_controllers_.begin();
            it != known_controllers_.end(); ++it)
         all_controller_names.push_back(it->first);
+      
+      for (auto name: all_controller_names) {
+        ROS_INFO_STREAM("TrajectoryExecutionManager/all_controllers: " << name);
+      }
       if (selectControllers(actuated_joints, all_controller_names, context.controllers_))
       {
         if (distributeTrajectory(trajectory, context.controllers_, context.trajectory_parts_))

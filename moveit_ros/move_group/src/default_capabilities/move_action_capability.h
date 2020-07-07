@@ -63,7 +63,8 @@ private:
   void setMoveState(MoveGroupState state);
   bool planUsingPlanningPipeline(const planning_interface::MotionPlanRequest& req,
                                  plan_execution::ExecutableMotionPlan& plan);
-
+  bool continuePlanUsingPlanningPipeline(const planning_interface::MotionPlanRequest& req,
+                                         plan_execution::ExecutableMotionPlan& plan);
   std::unique_ptr<actionlib::SimpleActionServer<moveit_msgs::MoveGroupAction> > move_action_server_;
   moveit_msgs::MoveGroupFeedback move_feedback_;
 

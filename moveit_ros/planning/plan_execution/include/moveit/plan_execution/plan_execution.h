@@ -140,7 +140,7 @@ public:
 
   std::string getErrorCodeString(const moveit_msgs::MoveItErrorCodes& error_code);
 
-private:
+protected:
   void planAndExecuteHelper(ExecutableMotionPlan& plan, const Options& opt);
   bool isRemainingPathValid(const ExecutableMotionPlan& plan);
   bool isRemainingPathValid(const ExecutableMotionPlan& plan, const std::pair<int, int>& path_segment);

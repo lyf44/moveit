@@ -407,6 +407,8 @@ moveit_msgs::MoveItErrorCodes plan_execution::PlanExecution::executeAndMonitor(E
                                          boost::bind(&PlanExecution::successfulTrajectorySegmentExecution, this, &plan,
                                                      _1));
   // wait for path to be done, while checking that the path does not become invalid
+
+  ROS_INFO("PlanExecution: waiting for execution to be finished!!!");
   ros::Rate r(100);
   path_became_invalid_ = false;
   while (node_handle_.ok() && !execution_complete_ && !preempt_requested_ && !path_became_invalid_)

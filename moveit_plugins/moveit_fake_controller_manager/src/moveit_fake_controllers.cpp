@@ -40,6 +40,9 @@
 #include <sensor_msgs/JointState.h>
 #include <boost/thread.hpp>
 #include <limits>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2/LinearMath/Matrix3x3.h>
 
 namespace moveit_fake_controller_manager
 {
@@ -158,7 +161,7 @@ ViaPointController::~ViaPointController() = default;
 
 void ViaPointController::execTrajectory(const moveit_msgs::RobotTrajectory& t)
 {
-  ROS_INFO("Fake execution of trajectory");
+  ROS_INFO("ViaPointController: Fake execution of trajectory");
   sensor_msgs::JointState js;
   js.header = t.joint_trajectory.header;
   js.name = t.joint_trajectory.joint_names;
@@ -173,6 +176,40 @@ void ViaPointController::execTrajectory(const moveit_msgs::RobotTrajectory& t)
     js.position = via->positions;
     js.velocity = via->velocities;
     js.effort = via->effort;
+
+    ros::Duration wait_time = via->time_from_start - (ros::Time::now() - start_time);
+    if (wait_time.toSec() > std::numeric_limits<float>::epsilon())
+    {
+      ROS_DEBUG("Fake execution: waiting %0.1fs for next via point, %ld remaining", wait_time.toSec(), end - via);
+      wait_time.sleep();
+    }
+    js.header.stamp = ros::Time::now();
+    pub_.publish(js);
+  }
+  
+  js.name = t.multi_dof_joint_trajectory.joint_names;
+  for (auto name: js.name) {
+    ROS_INFO_STREAM("InterpolatingController/multi_dof joint_name: " << name);
+  }
+  // publish joint states for all intermediate via points of the trajectory
+  // no further interpolation
+  start_time = ros::Time::now();
+  for (std::vector<trajectory_msgs::MultiDOFJointTrajectoryPoint>::const_iterator via = t.multi_dof_joint_trajectory.points.begin(),
+                                                                          end = t.multi_dof_joint_trajectory.points.end();
+       !cancelled() && via != end; ++via)
+  {
+    js.position.resize(3);
+    js.position[0] = via->transforms[0].translation.x;
+    js.position[1] = via->transforms[0].translation.y;
+
+    tf2::Quaternion quat_tf;
+    tf2::fromMsg(via->transforms[0].rotation, quat_tf);
+    tf2::Matrix3x3 m(quat_tf);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+
+    js.position[2] = yaw;
+    ROS_INFO_STREAM("InterpolatingController/js position: " << js.position[0] << " " << js.position[1] << " " << js.position[2]);
 
     ros::Duration wait_time = via->time_from_start - (ros::Time::now() - start_time);
     if (wait_time.toSec() > std::numeric_limits<float>::epsilon())
@@ -224,6 +261,12 @@ void InterpolatingController::execTrajectory(const moveit_msgs::RobotTrajectory&
   sensor_msgs::JointState js;
   js.header = t.joint_trajectory.header;
   js.name = t.joint_trajectory.joint_names;
+  for (auto name: js.name) {
+    ROS_INFO_STREAM("InterpolatingController/joint_name: " << name);
+  }
+  for (auto name: joints_) {
+    ROS_INFO_STREAM("InterpolatingController/has_joint_name: " << name);
+  }
 
   const std::vector<trajectory_msgs::JointTrajectoryPoint>& points = t.joint_trajectory.points;
   std::vector<trajectory_msgs::JointTrajectoryPoint>::const_iterator prev = points.begin(),  // previous via point

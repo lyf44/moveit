@@ -2,7 +2,8 @@ set(MOVEIT_LIB_NAME moveit_plan_execution)
 
 add_library(${MOVEIT_LIB_NAME}
   src/plan_with_sensing.cpp
-  src/plan_execution.cpp)
+  src/plan_execution.cpp
+  src/plan_while_execution.cpp)
 set_target_properties(${MOVEIT_LIB_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
 target_link_libraries(${MOVEIT_LIB_NAME}
   moveit_planning_pipeline

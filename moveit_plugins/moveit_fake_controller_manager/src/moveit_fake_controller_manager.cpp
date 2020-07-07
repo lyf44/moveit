@@ -45,7 +45,7 @@
 
 namespace moveit_fake_controller_manager
 {
-static const std::string DEFAULT_TYPE = "interpolate";
+static const std::string DEFAULT_TYPE = "via points";
 static const std::string ROBOT_DESCRIPTION = "robot_description";
 
 class MoveItFakeControllerManager : public moveit_controller_manager::MoveItControllerManager
@@ -70,7 +70,8 @@ public:
     /* by setting latch to true we preserve the initial joint state while other nodes launch */
     bool latch = true;
     pub_ = node_handle_.advertise<sensor_msgs::JointState>("fake_controller_joint_states", 100, latch);
-
+    // pub_ = node_handle_.advertise<sensor_msgs::JointState>("/joint_states", 100, latch);
+    
     /* publish initial pose */
     XmlRpc::XmlRpcValue initial;
     if (node_handle_.getParam("initial", initial))
