@@ -39,10 +39,10 @@ void PlanWhileExecution::planWhileExecute(ExecutableMotionPlan& plan, const Opti
     // run a planning loop
     do {
         waypoint_num++;
-        if (waypoint_num > 2) {
-            goal_reached = true;
-            break;
-        }
+        // if (waypoint_num > 2) {
+        //     goal_reached = true;
+        //     break;
+        // }
         ROS_INFO_NAMED("planWhileExecute", "Planning waypoint %u", waypoint_num);
 
         bool solved = false;
@@ -91,7 +91,10 @@ void PlanWhileExecution::planWhileExecute(ExecutableMotionPlan& plan, const Opti
 
         } while (!preempt_requested_ && max_replan_attempts > replan_attempts);
 
-        if (plan.error_code_.val == moveit_msgs::MoveItErrorCodes::SUCCESS) {
+        ROS_INFO("PlanWhileExecution: plan.error_code_.val: %d", plan.error_code_.val);
+
+        if (plan.error_code_.val == moveit_msgs::MoveItErrorCodes::SUCCESS || 
+                plan.error_code_.val == moveit_msgs::MoveItErrorCodes::INVALID_MOTION_PLAN) {
             if (opt.before_execution_callback_)
                 opt.before_execution_callback_();
 
@@ -103,7 +106,9 @@ void PlanWhileExecution::planWhileExecute(ExecutableMotionPlan& plan, const Opti
         }
 
         // TODO determine whether goal is reached???
-
+        if (solved && plan.error_code_.val == moveit_msgs::MoveItErrorCodes::SUCCESS) {
+            goal_reached = true;
+        }
     } while (!goal_reached && !preempt_requested_);
 
     ROS_INFO_NAMED("planWhileExecute", "planning finished");

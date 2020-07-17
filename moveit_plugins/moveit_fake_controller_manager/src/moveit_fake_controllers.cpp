@@ -203,7 +203,7 @@ void ViaPointController::execTrajectory(const moveit_msgs::RobotTrajectory& t)
       m.getRPY(roll, pitch, yaw);
 
       js.position[2] = yaw;
-      ROS_INFO_STREAM("ViaPointController/js position: " << js.position[0] << " " << js.position[1] << " " << js.position[2]);
+      // ROS_INFO_STREAM("ViaPointController/js position: " << js.position[0] << " " << js.position[1] << " " << js.position[2]);
 
       js.velocity.clear();
       js.effort.clear();

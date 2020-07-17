@@ -255,7 +255,7 @@ bool planning_pipeline::PlanningPipeline::generatePlan(const planning_scene::Pla
     if (check_solution_paths_)
     {
       std::vector<std::size_t> index;
-      if (!planning_scene->isPathValid(*res.trajectory_, req.path_constraints, req.group_name, false, &index))
+      if (!planning_scene->isPathValid(*res.trajectory_, req.path_constraints, req.goal_constraints, req.group_name, false, &index))
       {
         // check to see if there is any problem with the states that are found to be invalid
         // they are considered ok if they were added by a planning request adapter
@@ -275,7 +275,7 @@ bool planning_pipeline::PlanningPipeline::generatePlan(const planning_scene::Pla
         if (problem)
         {
           if (index.size() == 1 && index[0] == 0)  // ignore cases when the robot starts at invalid location
-            ROS_DEBUG("It appears the robot is starting at an invalid state, but that is ok.");
+            ROS_WARN("It appears the robot is starting at an invalid state, but that is ok.");
           else
           {
             valid = false;
@@ -320,11 +320,11 @@ bool planning_pipeline::PlanningPipeline::generatePlan(const planning_scene::Pla
           }
         }
         else
-          ROS_DEBUG("Planned path was found to be valid, except for states that were added by planning request "
+          ROS_WARN("Planned path was found to be valid, except for states that were added by planning request "
                     "adapters, but that is ok.");
       }
       else
-        ROS_DEBUG("Planned path was found to be valid when rechecked");
+        ROS_WARN("Planned path was found to be valid when rechecked");
     }
   }
 
