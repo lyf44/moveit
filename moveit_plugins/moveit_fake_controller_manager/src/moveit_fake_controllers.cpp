@@ -40,6 +40,7 @@
 #include <sensor_msgs/JointState.h>
 #include <boost/thread.hpp>
 #include <limits>
+
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/LinearMath/Matrix3x3.h>
@@ -164,15 +165,17 @@ void ViaPointController::execTrajectory(const moveit_msgs::RobotTrajectory& t)
   ROS_INFO("ViaPointController: Fake execution of trajectory");
   sensor_msgs::JointState js;
   js.header = t.joint_trajectory.header;
-  js.name = t.joint_trajectory.joint_names;
+  // js.name = t.joint_trajectory.joint_names;
 
   // publish joint states for all intermediate via points of the trajectory
   // no further interpolation
   ros::Time start_time = ros::Time::now();
+  std::vector<trajectory_msgs::MultiDOFJointTrajectoryPoint>::const_iterator via2 = t.multi_dof_joint_trajectory.points.begin();
   for (std::vector<trajectory_msgs::JointTrajectoryPoint>::const_iterator via = t.joint_trajectory.points.begin(),
                                                                           end = t.joint_trajectory.points.end();
        !cancelled() && via != end; ++via)
   {
+    js.name = t.joint_trajectory.joint_names;
     js.position = via->positions;
     js.velocity = via->velocities;
     js.effort = via->effort;
@@ -185,40 +188,35 @@ void ViaPointController::execTrajectory(const moveit_msgs::RobotTrajectory& t)
     }
     js.header.stamp = ros::Time::now();
     pub_.publish(js);
-  }
-  
-  js.name = t.multi_dof_joint_trajectory.joint_names;
-  for (auto name: js.name) {
-    ROS_INFO_STREAM("InterpolatingController/multi_dof joint_name: " << name);
-  }
-  // publish joint states for all intermediate via points of the trajectory
-  // no further interpolation
-  start_time = ros::Time::now();
-  for (std::vector<trajectory_msgs::MultiDOFJointTrajectoryPoint>::const_iterator via = t.multi_dof_joint_trajectory.points.begin(),
-                                                                          end = t.multi_dof_joint_trajectory.points.end();
-       !cancelled() && via != end; ++via)
-  {
-    js.position.resize(3);
-    js.position[0] = via->transforms[0].translation.x;
-    js.position[1] = via->transforms[0].translation.y;
 
-    tf2::Quaternion quat_tf;
-    tf2::fromMsg(via->transforms[0].rotation, quat_tf);
-    tf2::Matrix3x3 m(quat_tf);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
+    if (via2 != t.multi_dof_joint_trajectory.points.end()) {
+      js.name = t.multi_dof_joint_trajectory.joint_names;
+      js.position.clear();
+      js.position.resize(3);
+      js.position[0] = via2->transforms[0].translation.x;
+      js.position[1] = via2->transforms[0].translation.y;
 
-    js.position[2] = yaw;
-    ROS_INFO_STREAM("InterpolatingController/js position: " << js.position[0] << " " << js.position[1] << " " << js.position[2]);
+      tf2::Quaternion quat_tf;
+      tf2::fromMsg(via2->transforms[0].rotation, quat_tf);
+      tf2::Matrix3x3 m(quat_tf);
+      double roll, pitch, yaw;
+      m.getRPY(roll, pitch, yaw);
 
-    ros::Duration wait_time = via->time_from_start - (ros::Time::now() - start_time);
-    if (wait_time.toSec() > std::numeric_limits<float>::epsilon())
-    {
-      ROS_DEBUG("Fake execution: waiting %0.1fs for next via point, %ld remaining", wait_time.toSec(), end - via);
-      wait_time.sleep();
-    }
-    js.header.stamp = ros::Time::now();
-    pub_.publish(js);
+      js.position[2] = yaw;
+      ROS_INFO_STREAM("ViaPointController/js position: " << js.position[0] << " " << js.position[1] << " " << js.position[2]);
+
+      js.velocity.clear();
+      js.effort.clear();
+      ros::Duration wait_time = via->time_from_start - (ros::Time::now() - start_time);
+      if (wait_time.toSec() > std::numeric_limits<float>::epsilon())
+      {
+        ROS_DEBUG("Fake execution: waiting %0.1fs for next via point, %ld remaining", wait_time.toSec(), end - via);
+        wait_time.sleep();
+      }
+      js.header.stamp = ros::Time::now();
+      pub_.publish(js);
+      ++via2;
+    } 
   }
   ROS_DEBUG("Fake execution of trajectory: done");
 }

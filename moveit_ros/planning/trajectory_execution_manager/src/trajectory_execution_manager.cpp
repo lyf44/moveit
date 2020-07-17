@@ -270,7 +270,7 @@ bool TrajectoryExecutionManager::push(const moveit_msgs::RobotTrajectory& trajec
   TrajectoryExecutionContext* context = new TrajectoryExecutionContext();
   if (configure(*context, trajectory, controllers))
   {
-    // if (verbose_)
+    if (verbose_)
     {
       std::stringstream ss;
       ss << "Pushed trajectory for execution using controllers [ ";
