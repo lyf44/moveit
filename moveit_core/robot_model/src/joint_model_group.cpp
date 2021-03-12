@@ -382,8 +382,13 @@ bool JointModelGroup::satisfiesPositionBounds(const double* state, const JointBo
   assert(active_joint_bounds.size() == active_joint_model_vector_.size());
   for (std::size_t i = 0; i < active_joint_model_vector_.size(); ++i)
     if (!active_joint_model_vector_[i]->satisfiesPositionBounds(state + active_joint_model_start_index_[i],
-                                                                *active_joint_bounds[i], margin))
-      return false;
+                                                                *active_joint_bounds[i], margin)) {
+      if (i > 1) {
+        ROS_ERROR("satisfiesPositionBounds failed!, i = %d state = %f, bounds_min = %f, bounds_max = %f", i, *(state + active_joint_model_start_index_[i]),
+          (*active_joint_bounds[i])[0].min_position_, (*active_joint_bounds[i])[0].max_position_);
+        return false;
+      }
+    }
   return true;
 }
 
