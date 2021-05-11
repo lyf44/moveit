@@ -171,8 +171,46 @@ double ompl_interface::ModelBasedStateSpace::distance(const ompl::base::State* s
 {
   if (distance_function_)
     return distance_function_(state1, state2);
-  else
-    return spec_.joint_model_group_->distance(state1->as<StateType>()->values, state2->as<StateType>()->values);
+  else {
+      // double* pValues = state1->as<StateType>()->values;
+      // std::vector<double> attScore(11, 1.0);
+
+      // // hardcode to map to attention
+      // if (pValues[1] <= 4 && pValues[1] >= 1.5 && pValues[0] <= 2 && pValues[0] >= 0.5) {
+      //   // reduce arm and torso attention
+      //   for (int i = 3; i < 11; ++i) {
+      //     attScore[i] = 0.2; 
+      //   }
+      // }
+      // else if (pValues[1] <= 4 && pValues[1] >= 1.5 && pValues[0] <= 2 && pValues[0] >= -2) {
+      //   // reduce base attention
+      //   for (int i = 0; i < 3; ++i) {
+      //     attScore[i] = 0.5; 
+      //   }
+      // }
+      // else if (pValues[1] >= -1.5 && pValues[1] <= 0.5 && pValues[0] <= 2 && pValues[0] >= -2) {
+      //   // reduce arm and torso attention
+      //   for (int i = 3; i < 11; ++i) {
+      //     attScore[i] = 0.2; 
+      //   }
+      // }
+
+      // auto pNewState2 = allocState();
+      // double* pState2Values = state2->as<StateType>()->values;
+      // double* pNewState2Values = pNewState2->as<StateType>()->values;
+      // for (int i = 0; i < 11; ++i) {
+      //   // ROS_WARN_STREAM("sampleUniformNear, pValue" << pValues[i]);
+      //   // ROS_WARN_STREAM("sampleUniformNear, attention_score" << attScore[i]);
+      //   pNewState2Values[i] = pValues[i] + attScore[i] * (pState2Values[i] - pValues[i]);
+      // }
+
+      // double d = spec_.joint_model_group_->distance(state1->as<StateType>()->values, pNewState2Values);
+      // freeState(pNewState2);
+
+      // return d;
+      return spec_.joint_model_group_->distance(state1->as<StateType>()->values, state2->as<StateType>()->values);
+  }
+    
 }
 
 bool ompl_interface::ModelBasedStateSpace::equalStates(const ompl::base::State* state1,
@@ -261,15 +299,77 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
 
     void sampleUniform(ompl::base::State* state) override
     {
+      // ROS_INFO_STREAM("sample uniform!!");
       joint_model_group_->getVariableRandomPositions(moveit_rng_, state->as<StateType>()->values, *joint_bounds_);
+      double* pValues = state->as<StateType>()->values;
+      // pValues[3] = 0.38; 
+      // pValues[4] = 1.32;
+      // pValues[5] = 1.40;
+      // pValues[6] = -0.2;
+      // pValues[7] = 1.72;
+      // pValues[8] = 0.0;
+      // pValues[9] = 1.66;
+      // pValues[10] = 0.0;
       state->as<StateType>()->clearKnownInformation();
     }
 
     void sampleUniformNear(ompl::base::State* state, const ompl::base::State* near, const double distance) override
     {
-      joint_model_group_->getVariableRandomPositionsNearBy(moveit_rng_, state->as<StateType>()->values, *joint_bounds_,
-                                                           near->as<StateType>()->values, distance);
-      state->as<StateType>()->clearKnownInformation();
+      // joint_model_group_->getVariableRandomPositionsNearBy(moveit_rng_, state->as<StateType>()->values, *joint_bounds_,
+      //                                                      near->as<StateType>()->values, distance);
+      // state->as<StateType>()->clearKnownInformation();
+
+      // ROS_WARN_STREAM("sampleUniformNear, override to get attention!!");
+      // int cnt = joint_model_group_->getVariableCount();
+
+      double* pValues = near->as<StateType>()->values;
+      std::vector<double> attScore(11, 1.0);
+
+      // hardcode to map to attention
+      // if (pValues[1] <= 4 && pValues[1] >= 1.5 && pValues[0] <= 2 && pValues[0] >= 0.5) {
+      //   // reduce arm and torso attention
+      //   for (int i = 0; i < 11; ++i) {
+      //     attScore[i] = 0.2; 
+      //   }
+      //   attScore[1] = 1.0; 
+      // }
+      // else if (pValues[1] <= 4 && pValues[1] >= 1.5 && pValues[0] <= 2 && pValues[0] >= -2) {
+      //   // reduce base attention
+      //   // for (int i = 0; i < 3; ++i) {
+      //   //   attScore[i] = 0.5; 
+      //   // }
+      // }
+      // else if (pValues[1] >= -1.5 && pValues[1] <= 0.5 && pValues[0] <= 2 && pValues[0] >= -2) {
+      //   // reduce arm and torso attention
+      //   for (int i = 3; i < 11; ++i) {
+      //     attScore[i] = 0.2; 
+      //   }
+      // }
+
+      for (int i = 3; i < 11; ++i) {
+        attScore[i] = 0.0; 
+      }
+
+      double* pSampledValues = state->as<StateType>()->values;        
+      ROS_WARN_STREAM("----------------------------------------------");
+      for (int i = 0; i < 11; ++i) {
+        // ROS_WARN_STREAM("sampleUniformNear, pSampledValue: " << pSampledValues[i]);
+        ROS_WARN_STREAM("sampleUniformNear, pValue: " << pValues[i]);
+        // ROS_WARN_STREAM("sampleUniformNear, attention_score: " << attScore[i]);
+        pSampledValues[i] = pValues[i] + attScore[i] * (pSampledValues[i] - pValues[i]);
+      }
+      // pSampledValues[3] = 0.38; 
+      // pSampledValues[4] = 1.32;
+      // pSampledValues[5] = 1.40;
+      // pSampledValues[6] = -0.2;
+      // pSampledValues[7] = 1.72;
+      // pSampledValues[8] = 0.0;
+      // pSampledValues[9] = 1.66;
+      // pSampledValues[10] = 0.0;
+      for (int i = 0; i < 11; ++i) {
+        ROS_WARN_STREAM("sampleUniformNear, pSampledValue after: " << pSampledValues[i]);
+      }
+      // state->as<StateType>()->clearKnownInformation();
     }
 
     void sampleGaussian(ompl::base::State* state, const ompl::base::State* mean, const double stdDev) override
