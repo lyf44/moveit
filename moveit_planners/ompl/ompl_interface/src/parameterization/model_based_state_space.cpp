@@ -326,29 +326,34 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       std::vector<double> attScore(11, 1.0);
 
       // hardcode to map to attention
-      // if (pValues[1] <= 4 && pValues[1] >= 1.5 && pValues[0] <= 2 && pValues[0] >= 0.5) {
-      //   // reduce arm and torso attention
-      //   for (int i = 3; i < 11; ++i) {
-      //     attScore[i] = 0.2; 
-      //   }
-      //   // attScore[1] = 1.0; 
-      // }
-      // else if (pValues[1] <= 4 && pValues[1] >= 1.5 && pValues[0] <= 2 && pValues[0] >= -2) {
-      //   // reduce base attention
-      //   for (int i = 0; i < 3; ++i) {
-      //     attScore[i] = 0.5; 
-      //   }
-      // }
-      // else if (pValues[1] >= -1.5 && pValues[1] <= 0.5 && pValues[0] <= 2 && pValues[0] >= -2) {
-      //   // reduce arm and torso attention
-      //   for (int i = 3; i < 11; ++i) {
-      //     attScore[i] = 0.2; 
-      //   }
-      // }
-
-      for (int i = 3; i < 11; ++i) {
-        attScore[i] = 0.1; 
+      if (pValues[0] >= -1.5 && pValues[0] <= -0.5 && pValues[1] <= 2.5 && pValues[1] >= -0.5) {
+        // reduce arm and torso attention
+        for (int i = 0; i < 11; ++i) {
+          if (i != 1) {
+            attScore[i] = 0.1; 
+          }
+        }
       }
+      else if (pValues[0] >= -1.5 && pValues[0] <= 1.5 && pValues[1] <= 0.5 && pValues[1] >= -0.5) {
+        // reduce arm and torso attention
+        for (int i = 0; i < 11; ++i) {
+          if (i != 0) {
+            attScore[i] = 0.1; 
+          }
+        }
+      }
+      else if (pValues[0] >= 0.5 && pValues[0] <= 1.5 && pValues[1] <= 0.5 && pValues[1] >= -2.5) {
+        // reduce arm and torso attention
+        for (int i = 0; i < 11; ++i) {
+          if (i != 1) {
+            attScore[i] = 0.1; 
+          }
+        }
+      }
+
+      // for (int i = 3; i < 11; ++i) {
+      //   attScore[i] = 0.0; 
+      // }
 
       double* pSampledValues = state->as<StateType>()->values;        
       // ROS_WARN_STREAM("----------------------------------------------");
@@ -366,9 +371,9 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       // pSampledValues[8] = 0.0;
       // pSampledValues[9] = 1.66;
       // pSampledValues[10] = 0.0;
-      for (int i = 0; i < 11; ++i) {
-        // ROS_WARN_STREAM("sampleUniformNear, pSampledValue after: " << pSampledValues[i]);
-      }
+      // for (int i = 0; i < 11; ++i) {
+      //   ROS_WARN_STREAM("sampleUniformNear, pSampledValue after: " << pSampledValues[i]);
+      // }
       // state->as<StateType>()->clearKnownInformation();
     }
 
