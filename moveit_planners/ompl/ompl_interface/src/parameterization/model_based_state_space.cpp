@@ -328,16 +328,16 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       // hardcode to map to attention
       // if (pValues[1] <= 4 && pValues[1] >= 1.5 && pValues[0] <= 2 && pValues[0] >= 0.5) {
       //   // reduce arm and torso attention
-      //   for (int i = 0; i < 11; ++i) {
+      //   for (int i = 3; i < 11; ++i) {
       //     attScore[i] = 0.2; 
       //   }
-      //   attScore[1] = 1.0; 
+      //   // attScore[1] = 1.0; 
       // }
       // else if (pValues[1] <= 4 && pValues[1] >= 1.5 && pValues[0] <= 2 && pValues[0] >= -2) {
       //   // reduce base attention
-      //   // for (int i = 0; i < 3; ++i) {
-      //   //   attScore[i] = 0.5; 
-      //   // }
+      //   for (int i = 0; i < 3; ++i) {
+      //     attScore[i] = 0.5; 
+      //   }
       // }
       // else if (pValues[1] >= -1.5 && pValues[1] <= 0.5 && pValues[0] <= 2 && pValues[0] >= -2) {
       //   // reduce arm and torso attention
@@ -347,14 +347,14 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       // }
 
       for (int i = 3; i < 11; ++i) {
-        attScore[i] = 0.0; 
+        attScore[i] = 0.1; 
       }
 
       double* pSampledValues = state->as<StateType>()->values;        
-      ROS_WARN_STREAM("----------------------------------------------");
+      // ROS_WARN_STREAM("----------------------------------------------");
       for (int i = 0; i < 11; ++i) {
         // ROS_WARN_STREAM("sampleUniformNear, pSampledValue: " << pSampledValues[i]);
-        ROS_WARN_STREAM("sampleUniformNear, pValue: " << pValues[i]);
+        // ROS_WARN_STREAM("sampleUniformNear, pValue: " << pValues[i]);
         // ROS_WARN_STREAM("sampleUniformNear, attention_score: " << attScore[i]);
         pSampledValues[i] = pValues[i] + attScore[i] * (pSampledValues[i] - pValues[i]);
       }
@@ -367,7 +367,7 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       // pSampledValues[9] = 1.66;
       // pSampledValues[10] = 0.0;
       for (int i = 0; i < 11; ++i) {
-        ROS_WARN_STREAM("sampleUniformNear, pSampledValue after: " << pSampledValues[i]);
+        // ROS_WARN_STREAM("sampleUniformNear, pSampledValue after: " << pSampledValues[i]);
       }
       // state->as<StateType>()->clearKnownInformation();
     }
