@@ -369,10 +369,10 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       // }
       attScore[0] = 0.1; // base_x
       attScore[1] = 0.1; // base_y
-      // attScore[4] = 0.1; // shoulder_pan
-      // attScore[6] = 0.1; // upperarm roll
-      // attScore[8] = 0.1; // forearm_roll_joint
-      // attScore[10] = 0.1; // wrist_roll_joint
+      attScore[4] = 0.1; // shoulder_pan
+      attScore[6] = 0.1; // upperarm roll
+      attScore[8] = 0.1; // forearm_roll_joint
+      attScore[10] = 0.1; // wrist_roll_joint
 
       double* pSampledValues = state->as<StateType>()->values;        
       // ROS_WARN_STREAM("----------------------------------------------");
