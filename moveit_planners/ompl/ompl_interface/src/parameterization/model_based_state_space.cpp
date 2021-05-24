@@ -36,6 +36,7 @@
 
 #include <moveit/ompl_interface/parameterization/model_based_state_space.h>
 #include <utility>
+#include <ompl/base/spaces/RealVectorBounds.h>
 
 namespace ompl_interface
 {
@@ -43,7 +44,7 @@ constexpr char LOGNAME[] = "model_based_state_space";
 }  // namespace ompl_interface
 
 ompl_interface::ModelBasedStateSpace::ModelBasedStateSpace(ModelBasedStateSpaceSpecification spec)
-  : ompl::base::StateSpace(), spec_(std::move(spec))
+  : ompl::base::RealVectorStateSpace(spec.joint_model_group_->getVariableCount()), spec_(std::move(spec))
 {
   // set the state space name
   setName(spec_.joint_model_group_->getName());
@@ -70,6 +71,18 @@ ompl_interface::ModelBasedStateSpace::ModelBasedStateSpace(ModelBasedStateSpaceS
     joint_bounds_storage_[i] = *spec_.joint_bounds_[i];
     spec_.joint_bounds_[i] = &joint_bounds_storage_[i];
   }
+
+  // Set up the Real Vector bounds.
+  ompl::base::RealVectorBounds bounds(variable_count_);
+  int i = 0;
+  for (auto rob_bounds : spec_.joint_bounds_) {
+    for(auto var_bounds : *rob_bounds) {
+      bounds.setLow(i, var_bounds.min_position_);
+      bounds.setHigh(i, var_bounds.max_position_);
+      i++;
+    }
+  }
+  setBounds(bounds);
 
   // default settings
   setTagSnapToSegment(0.95);
