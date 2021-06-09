@@ -337,8 +337,8 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       // ROS_WARN_STREAM("sampleUniformNear, override to get attention!!");
       // int cnt = joint_model_group_->getVariableCount();
 
-      // double* pValues = near->as<StateType>()->values;
-      // std::vector<double> attScore(11, 1.0);
+      double* pValues = near->as<StateType>()->values;
+      std::vector<double> attScore(11, 1.0);
 
       // // hardcode to map to attention
       // bool move_base = true;
@@ -389,49 +389,55 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       //   attScore[2] = 0;
       // }
 
-      double* pValues = near->as<StateType>()->values;
-      std::vector<double> attScore(11, 0.01);
+      // double* pValues = near->as<StateType>()->values;
+      // std::vector<double> attScore(11, 0.01);
 
-      // hardcode to map to attention
-      bool move_base = true;
-      if (std::abs(pValues[3] - 0.02) > 0.1) {
-        attScore[3] = 1.0;
-      }
-      else if (std::abs(pValues[4] - 1.32) > 0.1) {
-        attScore[4] = 1.0;
-      }
-      else if (std::abs(pValues[5] - 1.40) > 0.1) {
-        attScore[5] = 1.0;
-      }
-      else if (std::abs(pValues[6] + 0.2) > 0.1) {
-        attScore[6] = 1.0;
-      }
-      else if (std::abs(pValues[7] - 1.72) > 0.1) {
-        attScore[7] = 1.0;
-      }
-      else if (std::abs(pValues[8] - 0.0) > 0.1) {
-        attScore[8] = 1.0;
-      }
-      else if (std::abs(pValues[9] - 1.66) > 0.1) {
-        attScore[9] = 1.0;
-      }
-      else if (std::abs(pValues[10] - 0.0) > 0.1) {
-        attScore[10] = 1.0;
-      }
-      else {
-        attScore[0] = 1.0;
-        attScore[1] = 1.0;
-        attScore[2] = 1.0;
-      }
-
-      // if (pValues[0] >= -1.5 && pValues[0] <= -0.5 && pValues[1] <= 2.5 && pValues[1] >= -0.5) {
-      //   // reduce arm and torso attention
-      //   for (int i = 0; i < 11; ++i) {
-      //     if (i != 1) {
-      //       attScore[i] = 0.1; 
-      //     }
-      //   }
+      // // hardcode to map to attention
+      // bool move_base = true;
+      // if (std::abs(pValues[3] - 0.02) > 0.1) {
+      //   attScore[3] = 1.0;
       // }
+      // else if (std::abs(pValues[4] - 1.32) > 0.1) {
+      //   attScore[4] = 1.0;
+      // }
+      // else if (std::abs(pValues[5] - 1.40) > 0.1) {
+      //   attScore[5] = 1.0;
+      // }
+      // else if (std::abs(pValues[6] + 0.2) > 0.1) {
+      //   attScore[6] = 1.0;
+      // }
+      // else if (std::abs(pValues[7] - 1.72) > 0.1) {
+      //   attScore[7] = 1.0;
+      // }
+      // else if (std::abs(pValues[8] - 0.0) > 0.1) {
+      //   attScore[8] = 1.0;
+      // }
+      // else if (std::abs(pValues[9] - 1.66) > 0.1) {
+      //   attScore[9] = 1.0;
+      // }
+      // else if (std::abs(pValues[10] - 0.0) > 0.1) {
+      //   attScore[10] = 1.0;
+      // }
+      // else {
+      //   attScore[0] = 1.0;
+      //   attScore[1] = 1.0;
+      //   attScore[2] = 1.0;
+      // }
+
+      if (std::abs(pValues[0] + 4) < 0.5 && std::abs(pValues[0] - 4.2) < 0.5) {
+        // reduce arm and torso attention
+        for (int i = 3; i < 11; ++i) {
+            attScore[i] = 0.1;
+        }
+      }
+
+      if (std::abs(pValues[0] + 1.5) < 0.5 && std::abs(pValues[0] - 4.1) < 0.5) {
+        // reduce arm and torso attention
+        for (int i = 0; i < 2; ++i) {
+            attScore[i] = 0.1;
+        }
+      }
+
       // else if (pValues[0] >= -1.5 && pValues[0] <= 1.5 && pValues[1] <= 0.5 && pValues[1] >= -0.5) {
       //   // reduce arm and torso attention
       //   for (int i = 0; i < 11; ++i) {
