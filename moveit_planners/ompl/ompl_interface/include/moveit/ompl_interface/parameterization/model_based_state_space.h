@@ -75,6 +75,7 @@ struct ModelBasedStateSpaceSpecification
 OMPL_CLASS_FORWARD(ModelBasedStateSpace);
 
 class ModelBasedStateSpace : public ompl::base::RealVectorStateSpace
+// class ModelBasedStateSpace : public ompl::base::StateSpace
 {
 public:
   class StateType : public ompl::base::State
