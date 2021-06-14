@@ -581,8 +581,8 @@ bool ompl_interface::ModelBasedPlanningContext::solve(planning_interface::Motion
     double ptime = getLastPlanTime();
     if (simplify_solutions_)
     {
-      simplifySolution(request_.allowed_planning_time - ptime);
-      ptime += getLastSimplifyTime();
+      // simplifySolution(request_.allowed_planning_time - ptime);
+      // ptime += getLastSimplifyTime();
     }
 
     if (interpolate_)
@@ -622,12 +622,12 @@ bool ompl_interface::ModelBasedPlanningContext::solve(planning_interface::Motion
     // simplify solution if time remains
     if (simplify_solutions_)
     {
-      simplifySolution(request_.allowed_planning_time - ptime);
-      res.processing_time_.push_back(getLastSimplifyTime());
-      res.description_.emplace_back("simplify");
-      res.trajectory_.resize(res.trajectory_.size() + 1);
-      res.trajectory_.back().reset(new robot_trajectory::RobotTrajectory(getRobotModel(), getGroupName()));
-      getSolutionPath(*res.trajectory_.back());
+      // simplifySolution(request_.allowed_planning_time - ptime);
+      // res.processing_time_.push_back(getLastSimplifyTime());
+      // res.description_.emplace_back("simplify");
+      // res.trajectory_.resize(res.trajectory_.size() + 1);
+      // res.trajectory_.back().reset(new robot_trajectory::RobotTrajectory(getRobotModel(), getGroupName()));
+      // getSolutionPath(*res.trajectory_.back());
     }
 
     if (interpolate_)
