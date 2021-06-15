@@ -223,6 +223,26 @@ double ompl_interface::ModelBasedStateSpace::distance(const ompl::base::State* s
       // freeState(pNewState2);
 
       // return d;
+
+      // double values1_1[11] = {0};
+      // double values2_1[11] = {0};
+      // for (int i = 3; i < 11; ++i) {
+      //   values1_1[i] = state1->as<StateType>()->values[i];
+      //   values2_1[i] = state2->as<StateType>()->values[i];
+      // }
+      // double values1_2[11] = {0};
+      // double values2_2[11] = {0};
+      // for (int i = 0; i < 3; ++i) {
+      //   values1_2[i] = state1->as<StateType>()->values[i];
+      //   values2_2[i] = state2->as<StateType>()->values[i];
+      // }
+      // double d1 = spec_.joint_model_group_->distance(values1_1, values2_1);
+      // double d2 = spec_.joint_model_group_->distance(values1_2, values2_2);
+      // return d2 > d1 ? d2 : d1;
+      // return d2 > 2 ? d2 : d1;
+      // return d2;
+      // return 0.01 * d1 + d2;
+
       return spec_.joint_model_group_->distance(state1->as<StateType>()->values, state2->as<StateType>()->values);
   }
     
