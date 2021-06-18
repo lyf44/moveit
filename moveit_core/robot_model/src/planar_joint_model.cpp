@@ -44,7 +44,7 @@ namespace moveit
 {
 namespace core
 {
-PlanarJointModel::PlanarJointModel(const std::string& name) : JointModel(name), angular_distance_weight_(0.05)
+PlanarJointModel::PlanarJointModel(const std::string& name) : JointModel(name), angular_distance_weight_(1.0)
 {
   type_ = PLANAR;
 
