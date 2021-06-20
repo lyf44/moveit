@@ -418,12 +418,12 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
         if (std::abs(pValues[2]) > 0.2) {
           attScore[2] = 1.0;
         }
-        else if (std::abs(pValues[1] + 3.5) > 2) {
+        else if (std::abs(pValues[1] + 3.5) > 1) {
           attScore[0] = 0;
           attScore[1] = 1.0;
           attScore[2] = 0.05;
         }
-        // else if (std::abs(pValues[1] + 3.5) < 1) {
+        // else if (std::abs(pValues[1] + 3.5) < 2) {
         else {
           attScore[0] = 1.0;
           attScore[1] = 0.2;
@@ -449,6 +449,19 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
            attScore[i] = 0.01; 
         }
       }
+      // else {
+      //   for (int i = 0; i < 11; ++i) {
+      //      attScore[i] = 1.0; 
+      //   }
+      //   attScore[2] = 0.1;
+      // }
+      // if (std::abs(pValues[1] + 3) > 1) {
+      //   attScore[1] = 1;
+      // }
+      // else {
+      //   attScore[1] = 1;
+      //   attScore[2] = 1;
+      // }
 
       // RLS task 2 manual attention
       // if (pValues[0] < -2.5) {
