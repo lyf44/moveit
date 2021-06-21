@@ -414,41 +414,41 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       // ROS_WARN_STREAM("sampleUniformNear, pValue: " << pValues[0]);
       
       // RLS task 1 manual attention
-      if (pValues[0] > 4) {
-        if (std::abs(pValues[2]) > 0.2) {
-          attScore[2] = 1.0;
-        }
-        else if (std::abs(pValues[1] + 3.5) > 1) {
-          attScore[0] = 0;
-          attScore[1] = 1.0;
-          attScore[2] = 0.05;
-        }
-        // else if (std::abs(pValues[1] + 3.5) < 2) {
-        else {
-          attScore[0] = 1.0;
-          attScore[1] = 0.2;
-        }
-      }
-      else if (std::abs(pValues[4] - 1.32) > 0.1 || std::abs(pValues[5] - 1.40) > 0.1 || std::abs(pValues[6] + 0.2) > 0.1 || 
-        std::abs(pValues[7] - 1.72) > 0.1 || std::abs(pValues[8] - 0.0) > 0.1 || std::abs(pValues[9] - 1.66) > 0.1 || 
-        std::abs(pValues[10] - 0.0) > 0.1) {
-          for (int i = 4; i < 11; ++i) {
-           attScore[i] = 1.0; 
-          }
-          attScore[0] = 0.001;
-          attScore[1] = 0.001;
-          attScore[2] = 0.001;
-          attScore[3] = 0.001;
-      }
-      else {
-        attScore[0] = 1.0;
-        attScore[1] = 1.0;
-        attScore[2] = 0.01;
-        attScore[3] = 1.0;
-        for (int i = 4; i < 11; ++i) {
-           attScore[i] = 0.01; 
-        }
-      }
+      // if (pValues[0] > 4) {
+      //   if (std::abs(pValues[2]) > 0.2) {
+      //     attScore[2] = 1.0;
+      //   }
+      //   else if (std::abs(pValues[1] + 3.5) > 1) {
+      //     attScore[0] = 0;
+      //     attScore[1] = 1.0;
+      //     attScore[2] = 0.05;
+      //   }
+      //   // else if (std::abs(pValues[1] + 3.5) < 2) {
+      //   else {
+      //     attScore[0] = 1.0;
+      //     attScore[1] = 0.2;
+      //   }
+      // }
+      // else if (std::abs(pValues[4] - 1.32) > 0.1 || std::abs(pValues[5] - 1.40) > 0.1 || std::abs(pValues[6] + 0.2) > 0.1 || 
+      //   std::abs(pValues[7] - 1.72) > 0.1 || std::abs(pValues[8] - 0.0) > 0.1 || std::abs(pValues[9] - 1.66) > 0.1 || 
+      //   std::abs(pValues[10] - 0.0) > 0.1) {
+      //     for (int i = 4; i < 11; ++i) {
+      //      attScore[i] = 1.0; 
+      //     }
+      //     attScore[0] = 0.001;
+      //     attScore[1] = 0.001;
+      //     attScore[2] = 0.001;
+      //     attScore[3] = 0.001;
+      // }
+      // else {
+      //   attScore[0] = 1.0;
+      //   attScore[1] = 1.0;
+      //   attScore[2] = 0.01;
+      //   attScore[3] = 1.0;
+      //   for (int i = 4; i < 11; ++i) {
+      //      attScore[i] = 0.01; 
+      //   }
+      // }
       // else {
       //   for (int i = 0; i < 11; ++i) {
       //      attScore[i] = 1.0; 
@@ -464,28 +464,38 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
       // }
 
       // RLS task 2 manual attention
-      // if (pValues[0] < -2.5) {
-      //   for (int i = 0; i < 2; ++i) {
-      //     attScore[i] = 1.0; 
-      //   }
+      if (pValues[0] < -2.5) {
+          attScore[0] = 1.0; 
+      }
+      else if (pValues[1] < 4.2 || std::abs(pValues[3] - 0.25) > 0.1) {
+        attScore[1] = 1.0;
+        attScore[3] = 1.0; 
+      }
+      // else if (std::abs(pValues[4]) > 0.1 || std::abs(pValues[6]) > 0.1 ||  std::abs(pValues[8]) > 0.1) {
+      //   attScore[4] = 1.0; 
+      //   attScore[6] = 1.0; 
+      //   attScore[8] = 1.0; 
       // }
-      // else if (pValues[1] < 4.2 || std::abs(pValues[3] - 0.25) > 0.1) {
-      //   attScore[1] = 1.0;
-      //   attScore[3] = 1.0; 
+      // else if (std::abs(pValues[5] + 1.07) > 0.1 || std::abs(pValues[7] + 0.19) > 0.1|| std::abs(pValues[9] - 1.19) > 0.1) {
+      //   attScore[5] = 1.0; 
+      //   attScore[7] = 1.0; 
+      //   attScore[9] = 1.0; 
       // }
       // else if (std::abs(pValues[4]) > 0.1 || std::abs(pValues[5] + 1.07) > 0.1 || std::abs(pValues[6]) > 0.1 || 
-      //   std::abs(pValues[7] + 0.19) > 0.1 || std::abs(pValues[8]) > 0.1 || std::abs(pValues[9] - 1.19) > 0.1 || 
-      //   std::abs(pValues[10]) > 0.1) {
+      //   std::abs(pValues[7] + 0.19) > 0.1 || std::abs(pValues[8]) > 0.1 || std::abs(pValues[9] - 1.19) > 0.1) {
       //     for (int i = 4; i < 11; ++i) {
       //      attScore[i] = 1.0; 
       //     }
       // }
-      // else {
-      //   attScore[2] = 1.0;
-      //   attScore[0] = 1.0;
-      //   attScore[1] = 1.0;
-      // }
-      // attScore[10] = 0;
+      else {
+        for (int i = 0; i < 11; ++i) {
+           attScore[i] = 1.0; 
+        }
+        // attScore[2] = 1.0;
+        attScore[0] = 0.1;
+        attScore[1] = 0.01;
+      }
+      attScore[10] = 0;
 
       double* pSampledValues = state->as<StateType>()->values;
       // ROS_WARN_STREAM("----------------------------------------------");
